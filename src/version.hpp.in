@@ -1,0 +1,8 @@
+#pragma once
+
+namespace keys {
+
+constexpr const char* compiletime_version = "@version@";
+const char* get_runtime_version();
+
+} // namespace keys
