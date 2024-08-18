@@ -3,6 +3,9 @@
 #include <filesystem>
 #include <fstream>
 
+// External includes
+#include <status_bar/notify.hpp>
+
 // Local includes
 #include "function.hpp"
 #include "audio.hpp"
@@ -40,19 +43,35 @@ bool volume(Sound_mixer::mode mode, long percent_change) {
 }
 
 bool playback_toggle() {
-    return toggle(Sound_mixer::mode::playback);
+    bool return_value = toggle(Sound_mixer::mode::playback);
+    if (return_value) {
+        sbar::notify(sbar::field::volume_status);
+    }
+    return return_value;
 }
 
 bool playback(long percent_change) {
-    return volume(Sound_mixer::mode::playback, percent_change);
+    bool return_value = volume(Sound_mixer::mode::playback, percent_change);
+    if (return_value) {
+        sbar::notify(sbar::field::volume);
+    }
+    return return_value;
 }
 
 bool capture_toggle() {
-    return toggle(Sound_mixer::mode::capture);
+    bool return_value = toggle(Sound_mixer::mode::capture);
+    if (return_value) {
+        sbar::notify(sbar::field::capture_status);
+    }
+    return return_value;
 }
 
 bool capture(long percent_change) {
-    return volume(Sound_mixer::mode::capture, percent_change);
+    bool return_value = volume(Sound_mixer::mode::capture, percent_change);
+    if (return_value) {
+        sbar::notify(sbar::field::capture);
+    }
+    return return_value;
 }
 
 [[nodiscard]] std::optional<long> read_long(const std::filesystem::path& path) {
@@ -122,8 +141,16 @@ bool backlight(long percent_change) {
     double raw_change = static_cast<double>(percent_change)
       * static_cast<double>(max_brightness.value()) / 1e2F;
 
-    return write_long(device_brightness_path,
-      brightness.value() + static_cast<long>(std::round(raw_change)));
+    long new_brightness =
+      brightness.value() + static_cast<long>(std::round(raw_change));
+
+    if (! write_long(device_brightness_path, new_brightness)) {
+        return false;
+    }
+
+    sbar::notify(sbar::field::backlight);
+
+    return true;
 }
 
 } // namespace keys

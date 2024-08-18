@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Retrieve the function string
+    // Interpret arguments
     std::string function = program.get("function");
     std::string param = program.get("param");
     try {

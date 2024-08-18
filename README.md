@@ -4,13 +4,15 @@ Provides functions for common special (multimedia) keys. Communicates with [stat
 
 ## Build from Source
 
-### 1.&nbsp; Install a C++ compiler, Meson, GoogleTest (optional), argparse, and ALSA libraries.
+### 1.&nbsp; Install a C++ compiler, Meson, GoogleTest (optional), argparse, ALSA libraries, and status_bar.
 
 #### Linux (Arch):
 
 ```bash
 sudo pacman -S base-devel meson gtest argparse alsa-lib 
 ```
+
+> Important: Follow [these instructions](https://github.com/cshmookler/status_bar/blob/main/README.md) to install status_bar.
 
 ### 2.&nbsp; Clone this project.
 
@@ -38,3 +40,8 @@ ninja
 - [X] capture volume mute
 - [X] capture volume up/down
 - [X] backlight up/down
+- [X] communicate with status_bar
+- [ ] add more to the help message
+- [ ] improve error reporting and logging
+- [ ] add more documentation
+- [ ] add tests

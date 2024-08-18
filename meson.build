@@ -36,6 +36,7 @@ exe_special_keys = executable(
         src_dir / 'audio.cpp'
     ),
     dependencies : [ dep_alsa ],
+    link_args : '-lstatus_bar_notify',
     install : true,
 )
 
