@@ -1,4 +1,5 @@
 // Standard includes
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -39,7 +40,11 @@ bool volume(Sound_mixer::mode mode, long percent_change) {
         return false;
     }
 
-    return sound_mixer.set_volume(volume.value() + percent_change);
+    long new_volume = volume.value() + percent_change;
+
+    long clamped_new_volume = std::clamp(new_volume, 0L, 100L);
+
+    return sound_mixer.set_volume(clamped_new_volume);
 }
 
 bool playback_toggle() {
@@ -144,7 +149,10 @@ bool backlight(long percent_change) {
     long new_brightness =
       brightness.value() + static_cast<long>(std::round(raw_change));
 
-    if (! write_long(device_brightness_path, new_brightness)) {
+    long clamped_new_brightness =
+      std::clamp(new_brightness, 0L, max_brightness.value());
+
+    if (! write_long(device_brightness_path, clamped_new_brightness)) {
         return false;
     }
 
