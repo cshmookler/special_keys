@@ -21,10 +21,10 @@ configure_file(
     output : 'version.hpp',
 )
 
-dep_alsa = dependency(
-    'alsa',
+cpp = meson.get_compiler('cpp')
+lib_system_state = cpp.find_library(
+    'system_state',
     required : true,
-    method : 'auto',
 )
 
 exe_special_keys = executable(
@@ -32,11 +32,8 @@ exe_special_keys = executable(
     files(
         src_dir / 'main.cpp',
         src_dir / 'version.cpp',
-        src_dir / 'function.cpp',
-        src_dir / 'audio.cpp'
     ),
-    dependencies : [ dep_alsa ],
-    link_args : '-lstatus_bar_notify',
+    dependencies : lib_system_state,
     install : true,
 )
 
