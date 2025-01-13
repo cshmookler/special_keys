@@ -40,7 +40,7 @@ syst::result_t set_playback_volume(double volume) {
             continue;
         }
 
-        auto result = control.set_playback_volume_all(volume);
+        auto result = control.set_playback_volume_all_relative(volume);
         if (result.failure()) {
             return SYST_TRACE(result.error());
         }
@@ -80,7 +80,7 @@ syst::result_t set_capture_volume(double volume) {
             continue;
         }
 
-        auto result = control.set_capture_volume_all(volume);
+        auto result = control.set_capture_volume_all_relative(volume);
         if (result.failure()) {
             return SYST_TRACE(result.error());
         }
@@ -166,7 +166,8 @@ int main(int argc, char** argv) {
             }
 
             for (auto& backlight : backlights.value()) {
-                auto result = backlight.set_brightness(std::stod(param));
+                auto result =
+                  backlight.set_brightness_relative(std::stod(param));
                 if (result.failure()) {
                     std::cerr << result.error() << std::endl;
                     return 1;
