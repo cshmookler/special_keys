@@ -4,15 +4,17 @@
 
 // External includes
 #include <argparse/argparse.hpp>
-#include <system_state/core.hpp>
+#include <cpp_result/all.hpp>
+#include <status_bar/notify.hpp>
+#include <system_state/system_state.hpp>
 
 // Local includes
 #include "version.hpp"
 
-syst::result_t toggle_playback() {
+res::result_t toggle_playback() {
     auto sound_mixer = syst::sound_mixer_t::get();
     if (sound_mixer.has_error()) {
-        return SYST_TRACE(sound_mixer.error());
+        return RES_TRACE(sound_mixer.error());
     }
 
     for (auto& control : sound_mixer->all_controls()) {
@@ -22,17 +24,22 @@ syst::result_t toggle_playback() {
 
         auto result = control.toggle_playback_status();
         if (result.failure()) {
-            return SYST_TRACE(result.error());
+            return RES_TRACE(result.error());
         }
     }
 
-    return syst::success;
+    if (! sbar::notify(sbar::field::volume)) {
+        return RES_NEW_ERROR(
+          "Failed to notify status_bar that the volume has been changed");
+    }
+
+    return res::success;
 }
 
-syst::result_t set_playback_volume(double volume) {
+res::result_t set_playback_volume(double volume) {
     auto sound_mixer = syst::sound_mixer_t::get();
     if (sound_mixer.has_error()) {
-        return SYST_TRACE(sound_mixer.error());
+        return RES_TRACE(sound_mixer.error());
     }
 
     for (auto& control : sound_mixer->all_controls()) {
@@ -42,17 +49,22 @@ syst::result_t set_playback_volume(double volume) {
 
         auto result = control.set_playback_volume_all_relative(volume);
         if (result.failure()) {
-            return SYST_TRACE(result.error());
+            return RES_TRACE(result.error());
         }
     }
 
-    return syst::success;
+    if (! sbar::notify(sbar::field::volume)) {
+        return RES_NEW_ERROR(
+          "Failed to notify status_bar that the volume has been changed");
+    }
+
+    return res::success;
 }
 
-syst::result_t toggle_capture() {
+res::result_t toggle_capture() {
     auto sound_mixer = syst::sound_mixer_t::get();
     if (sound_mixer.has_error()) {
-        return SYST_TRACE(sound_mixer.error());
+        return RES_TRACE(sound_mixer.error());
     }
 
     for (auto& control : sound_mixer->all_controls()) {
@@ -62,17 +74,22 @@ syst::result_t toggle_capture() {
 
         auto result = control.toggle_capture_status();
         if (result.failure()) {
-            return SYST_TRACE(result.error());
+            return RES_TRACE(result.error());
         }
     }
 
-    return syst::success;
+    if (! sbar::notify(sbar::field::volume)) {
+        return RES_NEW_ERROR(
+          "Failed to notify status_bar that the volume has been changed");
+    }
+
+    return res::success;
 }
 
-syst::result_t set_capture_volume(double volume) {
+res::result_t set_capture_volume(double volume) {
     auto sound_mixer = syst::sound_mixer_t::get();
     if (sound_mixer.has_error()) {
-        return SYST_TRACE(sound_mixer.error());
+        return RES_TRACE(sound_mixer.error());
     }
 
     for (auto& control : sound_mixer->all_controls()) {
@@ -82,11 +99,37 @@ syst::result_t set_capture_volume(double volume) {
 
         auto result = control.set_capture_volume_all_relative(volume);
         if (result.failure()) {
-            return SYST_TRACE(result.error());
+            return RES_TRACE(result.error());
         }
     }
 
-    return syst::success;
+    if (! sbar::notify(sbar::field::volume)) {
+        return RES_NEW_ERROR(
+          "Failed to notify status_bar that the volume has been changed");
+    }
+
+    return res::success;
+}
+
+res::result_t set_backlight_brightness(double brightness) {
+    auto backlights = syst::backlight_t::all();
+    if (backlights.has_error()) {
+        return RES_TRACE(backlights.error());
+    }
+
+    for (auto& backlight : backlights.value()) {
+        auto result = backlight.set_brightness_relative(brightness);
+        if (result.failure()) {
+            return RES_TRACE(result.error());
+        }
+    }
+
+    if (! sbar::notify(sbar::field::backlight)) {
+        return RES_NEW_ERROR("Failed to notify status_bar that the backlight "
+                             "brightness has been changed");
+    }
+
+    return res::success;
 }
 
 int main(int argc, char** argv) {
@@ -128,7 +171,7 @@ int main(int argc, char** argv) {
             if (param == "toggle") {
                 auto result = toggle_playback();
                 if (result.failure()) {
-                    std::cerr << result.error() << std::endl;
+                    std::cerr << result.error().string() << '\n';
                     return 1;
                 }
                 return 0;
@@ -136,7 +179,7 @@ int main(int argc, char** argv) {
 
             auto result = set_playback_volume(std::stod(param));
             if (result.failure()) {
-                std::cerr << result.error() << std::endl;
+                std::cerr << result.error().string() << '\n';
                 return 1;
             }
             return 0;
@@ -145,7 +188,7 @@ int main(int argc, char** argv) {
             if (param == "toggle") {
                 auto result = toggle_capture();
                 if (result.failure()) {
-                    std::cerr << result.error() << std::endl;
+                    std::cerr << result.error().string() << '\n';
                     return 1;
                 }
                 return 0;
@@ -153,31 +196,21 @@ int main(int argc, char** argv) {
 
             auto result = set_capture_volume(std::stod(param));
             if (result.failure()) {
-                std::cerr << result.error() << std::endl;
+                std::cerr << result.error().string() << '\n';
                 return 1;
             }
             return 0;
         }
         if (function == backlight) {
-            auto backlights = syst::backlight_t::all();
-            if (backlights.has_error()) {
-                std::cerr << backlights.error() << std::endl;
+            auto result = set_backlight_brightness(std::stod(param));
+            if (result.failure()) {
+                std::cerr << result.error().string() << '\n';
                 return 1;
             }
-
-            for (auto& backlight : backlights.value()) {
-                auto result =
-                  backlight.set_brightness_relative(std::stod(param));
-                if (result.failure()) {
-                    std::cerr << result.error() << std::endl;
-                    return 1;
-                }
-            }
-
             return 0;
         }
     } catch (const std::invalid_argument& error) {
-        std::cerr << "std::invalid_argument: " << error.what() << std::endl;
+        std::cerr << "std::invalid_argument: " << error.what() << '\n';
         return 1;
     }
 

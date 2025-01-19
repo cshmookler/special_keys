@@ -22,6 +22,10 @@ configure_file(
 )
 
 cpp = meson.get_compiler('cpp')
+lib_status_bar_notify = cpp.find_library(
+    'status_bar_notify',
+    required : true,
+)
 lib_system_state = cpp.find_library(
     'system_state',
     required : true,
@@ -33,7 +37,10 @@ exe_special_keys = executable(
         src_dir / 'main.cpp',
         src_dir / 'version.cpp',
     ),
-    dependencies : lib_system_state,
+    dependencies : [
+        lib_status_bar_notify,
+        lib_system_state,
+    ],
     install : true,
 )
 
