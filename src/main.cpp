@@ -12,12 +12,12 @@
 #include "version.hpp"
 
 res::result_t toggle_playback() {
-    auto sound_mixer = syst::sound_mixer_t::get();
+    auto sound_mixer = syst::get_sound_mixer();
     if (sound_mixer.has_error()) {
         return RES_TRACE(sound_mixer.error());
     }
 
-    for (auto& control : sound_mixer->all_controls()) {
+    for (auto& control : sound_mixer->get_controls()) {
         if (! control.has_playback_status()) {
             continue;
         }
@@ -37,12 +37,12 @@ res::result_t toggle_playback() {
 }
 
 res::result_t set_playback_volume(double volume) {
-    auto sound_mixer = syst::sound_mixer_t::get();
+    auto sound_mixer = syst::get_sound_mixer();
     if (sound_mixer.has_error()) {
         return RES_TRACE(sound_mixer.error());
     }
 
-    for (auto& control : sound_mixer->all_controls()) {
+    for (auto& control : sound_mixer->get_controls()) {
         if (! control.has_playback_volume()) {
             continue;
         }
@@ -62,12 +62,12 @@ res::result_t set_playback_volume(double volume) {
 }
 
 res::result_t toggle_capture() {
-    auto sound_mixer = syst::sound_mixer_t::get();
+    auto sound_mixer = syst::get_sound_mixer();
     if (sound_mixer.has_error()) {
         return RES_TRACE(sound_mixer.error());
     }
 
-    for (auto& control : sound_mixer->all_controls()) {
+    for (auto& control : sound_mixer->get_controls()) {
         if (! control.has_capture_status()) {
             continue;
         }
@@ -87,12 +87,12 @@ res::result_t toggle_capture() {
 }
 
 res::result_t set_capture_volume(double volume) {
-    auto sound_mixer = syst::sound_mixer_t::get();
+    auto sound_mixer = syst::get_sound_mixer();
     if (sound_mixer.has_error()) {
         return RES_TRACE(sound_mixer.error());
     }
 
-    for (auto& control : sound_mixer->all_controls()) {
+    for (auto& control : sound_mixer->get_controls()) {
         if (! control.has_capture_volume()) {
             continue;
         }
@@ -112,7 +112,7 @@ res::result_t set_capture_volume(double volume) {
 }
 
 res::result_t set_backlight_brightness(double brightness) {
-    auto backlights = syst::backlight_t::all();
+    auto backlights = syst::get_backlights();
     if (backlights.has_error()) {
         return RES_TRACE(backlights.error());
     }
